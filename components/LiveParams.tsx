@@ -1,6 +1,6 @@
 "use client";
 
-import type { EnergyItem } from "@/lib/energy/types";
+import type { EnergyItem, LoadData } from "@/lib/energy/types";
 
 interface LiveParamsProps {
   latest: EnergyItem | null;
@@ -18,8 +18,8 @@ export function LiveParams({ latest, loading }: LiveParamsProps) {
     );
   }
 
-  const load = p.load ?? {};
-  const grid = p.in ?? {};
+  const load: LoadData = p.load ?? {};
+  const grid: LoadData = p.in ?? {};
 
   const params = [
     { label: "Vavg", value: load.Vavg, unit: "V" },

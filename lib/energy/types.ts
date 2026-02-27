@@ -44,6 +44,14 @@ export interface EnergyPayload {
   co2_energy_meter?: number;
   frascold_energy_meter?: number;
   new_IQF_energy_meter?: number;
+
+  // additional live data used by UI components
+  load?: LoadData;
+  in?: LoadData;
+  time?: number | string; // timestamp in ms or ISO
+
+  // other arbitrary payload fields may exist (eg. data_1, data_2)
+  [key: string]: any;
 }
 
 export interface EnergyItem {
