@@ -14,12 +14,24 @@ const cards: {
   color: string;
   format?: (v: number) => string;
 }[] = [
-  { key: "solarKw", label: "Solar Output", unit: "kW", color: "var(--accent-solar)" },
-  { key: "loadKw", label: "Load", unit: "kW", color: "var(--accent-load)" },
-  { key: "gridKw", label: "Grid", unit: "kW", color: "var(--accent-grid)" },
-  { key: "batteryVoltage", label: "Battery Voltage", unit: "V", color: "var(--accent-battery)" },
-  { key: "solarEfficiency", label: "Solar Efficiency", unit: "%", color: "var(--accent-solar)", format: (v) => v.toFixed(1) },
-  { key: "peakLoad24h", label: "Peak Load (24h)", unit: "kW", color: "var(--accent-muted)" },
+  {
+    key: "co2Energy",
+    label: "CO₂ Energy Meter",
+    unit: "kWh",
+    color: "var(--accent-solar)",
+  },
+  {
+    key: "frascoldEnergy",
+    label: "Frascold Energy Meter",
+    unit: "kWh",
+    color: "var(--accent-load)",
+  },
+  {
+    key: "newIqfEnergy",
+    label: "New IQF Energy Meter",
+    unit: "kWh",
+    color: "var(--accent-grid)",
+  },
 ];
 
 export function KpiCards({ kpis, loading }: KpiCardsProps) {

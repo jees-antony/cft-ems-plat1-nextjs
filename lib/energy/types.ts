@@ -40,20 +40,10 @@ export interface MpptData {
 }
 
 export interface EnergyPayload {
-  load?: LoadData;
-  in?: LoadData;
-  battery_voltage?: number;
-  KWH?: number;
-  data_1?: MpptData;
-  data_2?: MpptData;
-  data_3?: MpptData;
-  time?: string;
-  /** Backend-computed: solar kW */
-  solar_kw?: number;
-  /** Backend-computed: today solar kWh */
-  today_solar_kwh?: number;
-  /** Backend-computed: max demand 24h */
-  max_demand_24h?: number;
+  /** Energy meter values for EMS dashboard */
+  co2_energy_meter?: number;
+  frascold_energy_meter?: number;
+  new_IQF_energy_meter?: number;
 }
 
 export interface EnergyItem {
@@ -78,19 +68,13 @@ export interface LatestEnergyResponse {
 export interface EnergyDataPoint {
   time: string;
   timestamp: number;
-  loadKw?: number;
-  solarKw?: number;
-  gridKw?: number;
-  batteryVoltage?: number;
-  solarKwh?: number;
-  loadKwh?: number;
+  co2Energy?: number;
+  frascoldEnergy?: number;
+  newIqfEnergy?: number;
 }
 
 export interface TopKpis {
-  solarKw: number;
-  loadKw: number;
-  gridKw: number;
-  batteryVoltage: number;
-  solarEfficiency?: number;
-  peakLoad24h?: number;
+  co2Energy: number;
+  frascoldEnergy: number;
+  newIqfEnergy: number;
 }

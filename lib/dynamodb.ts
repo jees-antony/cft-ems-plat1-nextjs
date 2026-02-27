@@ -9,21 +9,33 @@ import {
   type QueryCommandInput,
 } from "@aws-sdk/lib-dynamodb";
 import type { EnergyItem, EnergyPayload } from "./energy/types";
-import { computeSolarKw } from "./energy/solar-calc";
 
-const PK = "zoladyne/ems";
+const PK = "cft/ems/site1";
 
-/** DynamoDB stores data in "payload.value" (literal key with dot) or payload.value; normalize to flat payload */
+/** Normalize DynamoDB item to EMS payload shape (three energy meters). */
 function normalizePayload(item: Record<string, unknown> | { payload?: unknown }): EnergyPayload {
   const rec = item as Record<string, unknown>;
-  const payloadDotValue = rec["payload.value"] as Record<string, unknown> | undefined;
+
+  // Handle literal "payload.value" attribute that may contain { value: { ...meters } }
+  const payloadDot = rec["payload.value"] as Record<string, unknown> | undefined;
+  if (payloadDot && typeof payloadDot === "object") {
+    const inner = (payloadDot as Record<string, unknown>).value as Record<string, unknown> | undefined;
+    if (inner && typeof inner === "object") {
+      return inner as EnergyPayload;
+    }
+    return payloadDot as EnergyPayload;
+  }
+
+  // Fallbacks if data is nested under payload / payload.value
   const payload = rec.payload as Record<string, unknown> | undefined;
-  const value = payload && typeof payload === "object" ? (payload.value as Record<string, unknown>) : undefined;
-  const hasEnergyData = (x: Record<string, unknown> | undefined) =>
-    x && typeof x === "object" && (x.load !== undefined || x.in !== undefined);
-  const candidate = payloadDotValue ?? value ?? payload;
-  if (hasEnergyData(candidate)) return candidate as EnergyPayload;
-  if (hasEnergyData(rec)) return rec as EnergyPayload;
+  if (payload && typeof payload === "object") {
+    const value = payload.value as Record<string, unknown> | undefined;
+    if (value && typeof value === "object") {
+      return value as EnergyPayload;
+    }
+    return payload as EnergyPayload;
+  }
+
   return {} as EnergyPayload;
 }
 
@@ -40,19 +52,25 @@ function getDocClient() {
 }
 
 function getTable(): string {
-  return process.env.DDB_TABLE ?? "zoladyne-dash";
+  return process.env.DDB_TABLE ?? "cft-ems-t1";
 }
 
 function enrichItem(rawItem: Record<string, unknown> | EnergyItem): EnergyItem {
   const payload = normalizePayload(rawItem);
-  if (payload.solar_kw === undefined) {
-    payload.solar_kw = computeSolarKw(payload);
-  }
   const item: EnergyItem = {
     PK: String(rawItem.PK ?? PK),
-    SK: String(rawItem.SK ?? ""),
+    SK: String(
+      (rawItem as Record<string, unknown>).timestamp ??
+        (rawItem as Record<string, unknown>).SK ??
+        ""
+    ),
     payload,
-    timestamp: rawItem.SK ? parseInt(String(rawItem.SK), 10) : undefined,
+    timestamp:
+      (rawItem as Record<string, unknown>).timestamp !== undefined
+        ? parseInt(String((rawItem as Record<string, unknown>).timestamp), 10)
+        : (rawItem as Record<string, unknown>).SK
+        ? parseInt(String((rawItem as Record<string, unknown>).SK), 10)
+        : undefined,
   };
   return item;
 }
@@ -136,7 +154,10 @@ export async function queryHistory(
 
   const input: QueryCommandInput = {
     TableName: getTable(),
-    KeyConditionExpression: "PK = :pk AND SK BETWEEN :start AND :end",
+    KeyConditionExpression: "PK = :pk AND #ts BETWEEN :start AND :end",
+    ExpressionAttributeNames: {
+      "#ts": "timestamp",
+    },
     ExpressionAttributeValues: {
       ":pk": PK,
       ":start": String(startMs),
@@ -182,7 +203,10 @@ export async function queryRange(
   do {
     const input: QueryCommandInput = {
       TableName: getTable(),
-      KeyConditionExpression: "PK = :pk AND SK BETWEEN :start AND :end",
+      KeyConditionExpression: "PK = :pk AND #ts BETWEEN :start AND :end",
+      ExpressionAttributeNames: {
+        "#ts": "timestamp",
+      },
       ExpressionAttributeValues: {
         ":pk": PK,
         ":start": String(startMs),
