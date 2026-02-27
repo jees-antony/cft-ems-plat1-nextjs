@@ -1,4 +1,4 @@
-# Zoladyne Energy Dashboard
+# CFT Energy Dash
 
 Full-stack Next.js energy monitoring dashboard that reads data from AWS DynamoDB.
 
