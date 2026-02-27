@@ -11,13 +11,15 @@ function kwOrKva(obj?: { Kw?: number; KVA?: number }): number | undefined {
 }
 
 export function mapItemsToDataPoints(items: EnergyItem[]): EnergyDataPoint[] {
-  // For the EMS dashboard we only care about latest point KPIs,
-  // so this returns minimal time-series data (timestamp only).
   return items.map((item) => {
     const ts = item.timestamp ?? parseInt(item.SK ?? "0", 10);
+    const p = item.payload ?? {};
     return {
       time: new Date(ts).toISOString(),
       timestamp: ts,
+      co2Energy: p.co2_energy_meter,
+      frascoldEnergy: p.frascold_energy_meter,
+      newIqfEnergy: p.new_IQF_energy_meter,
     };
   });
 }
