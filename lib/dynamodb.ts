@@ -51,8 +51,10 @@ function getClient(): DynamoDBClient | null {
     return new DynamoDBClient({ region });
   } catch (error) {
     console.error("[DynamoDB] Failed to initialize client:", error);
-    return null;
+    console.warn("[DynamoDB] Falling back to synthetic data mode");
+    return null;  // Fallback to synthetic mode
   }
+}
 }
 
 function getDocClient() {
@@ -101,20 +103,29 @@ export async function queryLastNPoints(
   const doc = getDocClient();
   if (!doc) return getSyntheticTrend(n);
 
-  const input: QueryCommandInput = {
-    TableName: getTable(),
-    KeyConditionExpression: "PK = :pk",
-    ExpressionAttributeValues: { ":pk": PK },
-    ScanIndexForward: false,
-    Limit: Math.min(n, 500),
-  };
-  const res = await doc.send(new QueryCommand(input));
-  const rawItems = (res.Items ?? []) as Record<string, unknown>[];
-  const items = rawItems.map(enrichItem);
-  const sorted = items.sort(
-    (a, b) => (a.timestamp ?? parseInt(a.SK, 10)) - (b.timestamp ?? parseInt(b.SK, 10))
-  );
-  return { items: sorted };
+  try {
+    const input: QueryCommandInput = {
+      TableName: getTable(),
+      KeyConditionExpression: "PK = :pk",
+      ExpressionAttributeValues: { ":pk": PK },
+      ScanIndexForward: false,
+      Limit: Math.min(n, 500),
+    };
+    const res = await doc.send(new QueryCommand(input));
+    const rawItems = (res.Items ?? []) as Record<string, unknown>[];
+    const items = rawItems.map(enrichItem);
+    const sorted = items.sort(
+      (a, b) => (a.timestamp ?? parseInt(a.SK, 10)) - (b.timestamp ?? parseInt(b.SK, 10))
+    );
+    return { items: sorted };
+  } catch (error: any) {
+    // If credentials error, fall back to synthetic data
+    if (error?.name === "CredentialsProviderError" || error?.code === "CredentialsError") {
+      console.warn("[DynamoDB Query] Credentials error, falling back to synthetic data:", error.message);
+      return getSyntheticTrend(n);
+    }
+    throw error;
+  }
 }
 
 /** Query latest single record */
@@ -130,16 +141,25 @@ export async function queryLatest(): Promise<EnergyItem | null> {
     return items[0] ?? null;
   }
 
-  const input: QueryCommandInput = {
-    TableName: getTable(),
-    KeyConditionExpression: "PK = :pk",
-    ExpressionAttributeValues: { ":pk": PK },
-    ScanIndexForward: false,
-    Limit: 1,
-  };
-  const res = await doc.send(new QueryCommand(input));
-  const raw = res.Items?.[0] as Record<string, unknown> | undefined;
-  return raw ? enrichItem(raw) : null;
+  try {
+    const input: QueryCommandInput = {
+      TableName: getTable(),
+      KeyConditionExpression: "PK = :pk",
+      ExpressionAttributeValues: { ":pk": PK },
+      ScanIndexForward: false,
+      Limit: 1,
+    };
+    const res = await doc.send(new QueryCommand(input));
+    const raw = res.Items?.[0] as Record<string, unknown> | undefined;
+    return raw ? enrichItem(raw) : null;
+  } catch (error: any) {
+    if (error?.name === "CredentialsProviderError" || error?.code === "CredentialsError") {
+      console.warn("[DynamoDB Query Latest] Credentials error, falling back to synthetic");
+      const { items } = await getSyntheticTrend(1);
+      return items[0] ?? null;
+    }
+    throw error;
+  }
 }
 
 /** Query by date range (UTC midnight timestamps) */
