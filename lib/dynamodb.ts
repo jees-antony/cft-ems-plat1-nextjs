@@ -55,7 +55,6 @@ function getClient(): DynamoDBClient | null {
     return null;  // Fallback to synthetic mode
   }
 }
-}
 
 function getDocClient() {
   const client = getClient();
