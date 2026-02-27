@@ -51,6 +51,11 @@ export interface EnergyPayload {
   time?: number | string; // timestamp in ms or ISO
 
   // other arbitrary payload fields may exist (eg. data_1, data_2)
+  // optional MPPT data (solar) and battery voltage
+  data_1?: MpptData;
+  data_2?: MpptData;
+  data_3?: MpptData;
+
   [key: string]: any;
 }
 
@@ -85,4 +90,10 @@ export interface TopKpis {
   co2Energy: number;
   frascoldEnergy: number;
   newIqfEnergy: number;
+
+  // additional KPIs for power flow component
+  solarKw: number;
+  gridKw: number;
+  loadKw: number;
+  batteryVoltage: number;
 }

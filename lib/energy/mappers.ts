@@ -24,12 +24,18 @@ export function mapItemsToDataPoints(items: EnergyItem[]): EnergyDataPoint[] {
   });
 }
 
+import { computeSolarKw } from "./solar-calc";
+
 export function mapLatestToKpis(item: EnergyItem | null): TopKpis {
   if (!item?.payload) {
     return {
       co2Energy: 0,
       frascoldEnergy: 0,
       newIqfEnergy: 0,
+      solarKw: 0,
+      gridKw: 0,
+      loadKw: 0,
+      batteryVoltage: 0,
     };
   }
   const p = item.payload;
@@ -37,5 +43,13 @@ export function mapLatestToKpis(item: EnergyItem | null): TopKpis {
     co2Energy: p.co2_energy_meter ?? 0,
     frascoldEnergy: p.frascold_energy_meter ?? 0,
     newIqfEnergy: p.new_IQF_energy_meter ?? 0,
+
+    solarKw: computeSolarKw(p),
+    gridKw: p.in?.Kw ?? 0,
+    loadKw: p.load?.Kw ?? 0,
+    batteryVoltage:
+      (p.battery_voltage as number) ??
+      (p.batteryVoltage as number) ??
+      0,
   };
 }
