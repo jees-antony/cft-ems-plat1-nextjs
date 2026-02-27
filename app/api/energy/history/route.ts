@@ -30,9 +30,16 @@ export async function GET(request: NextRequest) {
     if (lastKey) res.lastKey = lastKey;
     return NextResponse.json(res);
   } catch (err) {
-    console.error("[api/energy/history]", err);
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    const errorStack = err instanceof Error ? err.stack : "";
+    console.error("[api/energy/history] ERROR:", {
+      message: errorMessage,
+      stack: errorStack,
+      type: typeof err,
+      env: { REGION: process.env.REGION, DDB_TABLE: process.env.DDB_TABLE },
+    });
     return NextResponse.json(
-      { error: "Failed to fetch history", details: String(err) },
+      { error: "Failed to fetch history", details: errorMessage },
       { status: 500 }
     );
   }

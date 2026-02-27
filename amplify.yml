@@ -20,5 +20,5 @@ frontend:
 env:
   variables:
     NEXT_TELEMETRY_DISABLED: "1"
-    AWS_REGION: "ap-south-1"
+    REGION: "ap-south-1"
     DDB_TABLE: "cft-ems-t1"

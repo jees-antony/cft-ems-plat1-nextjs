@@ -15,9 +15,16 @@ export async function GET(request: NextRequest) {
     const { items } = await queryLastNPoints(points);
     return NextResponse.json({ items });
   } catch (err) {
-    console.error("[api/energy]", err);
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    const errorStack = err instanceof Error ? err.stack : "";
+    console.error("[api/energy] ERROR:", {
+      message: errorMessage,
+      stack: errorStack,
+      type: typeof err,
+      env: { REGION: process.env.REGION, DDB_TABLE: process.env.DDB_TABLE },
+    });
     return NextResponse.json(
-      { error: "Failed to fetch energy data", details: String(err) },
+      { error: "Failed to fetch energy data", details: errorMessage },
       { status: 500 }
     );
   }

@@ -40,7 +40,7 @@ function normalizePayload(item: Record<string, unknown> | { payload?: unknown })
 }
 
 function getClient(): DynamoDBClient | null {
-  const region = process.env.AWS_REGION ?? "ap-south-1";
+  const region = process.env.REGION ?? process.env.AWS_REGION ?? "ap-south-1";
   if (process.env.USE_SYNTHETIC_DATA === "1") return null;
   
   try {

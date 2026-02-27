@@ -11,9 +11,16 @@ export async function GET() {
     const item = await queryLatest();
     return NextResponse.json({ item });
   } catch (err) {
-    console.error("[api/energy/latest]", err);
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    const errorStack = err instanceof Error ? err.stack : "";
+    console.error("[api/energy/latest] ERROR:", {
+      message: errorMessage,
+      stack: errorStack,
+      type: typeof err,
+      env: { REGION: process.env.REGION, DDB_TABLE: process.env.DDB_TABLE },
+    });
     return NextResponse.json(
-      { error: "Failed to fetch latest energy data", details: String(err) },
+      { error: "Failed to fetch latest energy data", details: errorMessage },
       { status: 500 }
     );
   }
