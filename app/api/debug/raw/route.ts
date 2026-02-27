@@ -15,9 +15,6 @@ import {
 
 export async function GET() {
   try {
-    if (process.env.USE_SYNTHETIC_DATA === "1") {
-      return NextResponse.json({ mode: "synthetic", raw: null });
-    }
     const region = process.env.REGION ?? process.env.AWS_REGION ?? "ap-south-1";
     const table = process.env.DDB_TABLE ?? "zoladyne-dash";
     const client = new DynamoDBClient({ region });

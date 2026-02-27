@@ -23,8 +23,6 @@ export default function DashboardPage() {
     refreshInterval: POLL_INTERVAL_MS,
   });
 
-  const { data: healthData } = useSWR<{ mode?: string }>("/api/health", fetcher);
-
   const items = trendData?.items ?? [];
   const latest = latestData?.item ?? null;
   const energyData: EnergyDataPoint[] = mapItemsToDataPoints(items);
@@ -35,9 +33,6 @@ export default function DashboardPage() {
     <main className="dashboard">
       <header className="dashboard-header">
         <h1>Energy Management Dashboard</h1>
-        <span className="mode-badge">
-          {healthData?.mode === "synthetic" ? "Synthetic" : "Live"}
-        </span>
       </header>
 
       <KpiCards kpis={topKpis} loading={loading} />

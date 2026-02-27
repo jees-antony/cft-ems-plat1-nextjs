@@ -9,7 +9,7 @@ npm install
 npm run dev
 ```
 
-By default, the app runs in **synthetic mode** when AWS credentials are not configured. Set `USE_SYNTHETIC_DATA=1` explicitly or omit credentials to use mock data locally.
+**Production mode:** The app connects to AWS DynamoDB using configured credentials. If credentials are not available, API endpoints return empty data and log errors to CloudWatch.
 
 ## Environment Variables
 
@@ -19,7 +19,7 @@ By default, the app runs in **synthetic mode** when AWS credentials are not conf
 | `DDB_TABLE` | `zoladyne-dash` | DynamoDB table name |
 | `AWS_ACCESS_KEY_ID` | — | AWS access key (optional with IAM role) |
 | `AWS_SECRET_ACCESS_KEY` | — | AWS secret key |
-| `USE_SYNTHETIC_DATA` | — | Set to `1` to use mock data (no AWS) |
+
 
 ## API Routes
 
