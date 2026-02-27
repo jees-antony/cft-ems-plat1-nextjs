@@ -42,7 +42,17 @@ function normalizePayload(item: Record<string, unknown> | { payload?: unknown })
 function getClient(): DynamoDBClient | null {
   const region = process.env.AWS_REGION ?? "ap-south-1";
   if (process.env.USE_SYNTHETIC_DATA === "1") return null;
-  return new DynamoDBClient({ region });
+  
+  try {
+    // Log configuration for debugging (region only, not credentials)
+    if (process.env.NODE_ENV === "development") {
+      console.log("[DynamoDB] Initializing client with region:", region);
+    }
+    return new DynamoDBClient({ region });
+  } catch (error) {
+    console.error("[DynamoDB] Failed to initialize client:", error);
+    return null;
+  }
 }
 
 function getDocClient() {
