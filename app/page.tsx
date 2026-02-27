@@ -29,6 +29,13 @@ export default function DashboardPage() {
   const topKpis = mapLatestToKpis(latest);
   const loading = trendLoading || latestLoading;
 
+  // Log API responses and data mapping
+  console.log("[Dashboard] API trend response:", trendData);
+  console.log("[Dashboard] API latest response:", latestData);
+  console.log("[Dashboard] Mapped energy data:", energyData);
+  console.log("[Dashboard] Top KPIs:", topKpis);
+  console.log("[Dashboard] Loading:", loading);
+
   return (
     <main className="dashboard">
       <header className="dashboard-header">
@@ -45,6 +52,7 @@ export default function DashboardPage() {
           <EnergyBarChart kpis={topKpis} loading={loading} />
         </div>
       </div>
+
     </main>
   );
 }

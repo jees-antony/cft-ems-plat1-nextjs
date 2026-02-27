@@ -26,11 +26,15 @@ export function EnergyBarChart({ kpis, loading }: EnergyBarChartProps) {
     );
   }
 
+  console.log("[EnergyBarChart] KPI values:", kpis);
+
   const data = [
     { name: "CO₂", value: kpis.co2Energy },
     { name: "Frascold", value: kpis.frascoldEnergy },
     { name: "New IQF", value: kpis.newIqfEnergy },
   ];
+
+  console.log("[EnergyBarChart] Chart data:", data);
 
   return (
     <div className="chart-container">

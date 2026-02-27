@@ -36,12 +36,16 @@ export function TrendChart({ data, loading }: TrendChartProps) {
     );
   }
 
+  console.log("[TrendChart] Received data points:", data.length, data);
+
   const chartData = data.map((d) => ({
     time: formatTime(d.time),
     co2: d.co2Energy ?? 0,
     frascold: d.frascoldEnergy ?? 0,
     newIqf: d.newIqfEnergy ?? 0,
   }));
+
+  console.log("[TrendChart] Transformed chart data:", chartData);
 
   return (
     <div className="chart-container">

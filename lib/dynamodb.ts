@@ -81,6 +81,16 @@ function enrichItem(rawItem: Record<string, unknown> | EnergyItem): EnergyItem {
         ? parseInt(String((rawItem as Record<string, unknown>).SK), 10)
         : undefined,
   };
+
+  // if the raw payload didn't include a time field, use the item's
+  // timestamp (derived from SK) so that UI components can render it
+  if (
+    (item.payload.time === undefined || item.payload.time === null) &&
+    item.timestamp !== undefined
+  ) {
+    item.payload.time = item.timestamp;
+  }
+
   return item;
 }
 
