@@ -123,6 +123,15 @@ export async function queryLastNPoints(
     const sorted = items.sort(
       (a, b) => (a.timestamp ?? parseInt(a.SK, 10)) - (b.timestamp ?? parseInt(b.SK, 10))
     );
+    console.log(
+      `[DynamoDB] queryLastNPoints fetched ${items.length} item(s) (requested ${n})`
+    );
+    // also log first/last timestamps for quick sanity check
+    if (items.length > 0) {
+      console.log(
+        `[DynamoDB] first ts=${items[0].timestamp}, last ts=${items[items.length-1].timestamp}`
+      );
+    }
     return { items: sorted };
   } catch (error: any) {
     console.error("[DynamoDB Query] Error:", error?.message || String(error));
@@ -148,7 +157,9 @@ export async function queryLatest(): Promise<EnergyItem | null> {
     };
     const res = await doc.send(new QueryCommand(input));
     const raw = res.Items?.[0] as Record<string, unknown> | undefined;
-    return raw ? enrichItem(raw) : null;
+    const item = raw ? enrichItem(raw) : null;
+    console.log("[DynamoDB] queryLatest returned", item ? 1 : 0, "item(s)");
+    return item;
   } catch (error: any) {
     console.error("[DynamoDB Query Latest] Error:", error?.message || String(error));
     return null;

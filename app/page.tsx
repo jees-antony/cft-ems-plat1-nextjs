@@ -13,7 +13,7 @@ const POLL_INTERVAL_MS = 30_000;
 export default function DashboardPage() {
   const { data: trendData, isLoading: trendLoading } = useSWR<{
     items: EnergyItem[];
-  }>("/api/energy?points=60", fetcher, {
+  }>("/api/energy?points=6", fetcher, {
     refreshInterval: POLL_INTERVAL_MS,
   });
 
@@ -39,7 +39,7 @@ export default function DashboardPage() {
   return (
     <main className="dashboard">
       <header className="dashboard-header">
-        <h1>Energy Management Dashboard</h1>
+        <h1>CFT Energy Management Dashboard</h1>
       </header>
 
       <KpiCards kpis={topKpis} loading={loading} />

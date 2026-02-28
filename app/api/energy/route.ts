@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
       500
     );
     const { items } = await queryLastNPoints(points);
+    console.log("[api/energy] returning", items.length, "points");
     return NextResponse.json({ items });
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);
