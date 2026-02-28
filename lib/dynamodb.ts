@@ -8,7 +8,6 @@ import {
   QueryCommand,
   type QueryCommandInput,
 } from "@aws-sdk/lib-dynamodb";
-import { defaultProvider } from "@aws-sdk/credential-provider-node";
 import type { EnergyItem, EnergyPayload } from "./energy/types";
 
 const PK = "cft/ems/site1";
@@ -42,20 +41,16 @@ function normalizePayload(item: Record<string, unknown> | { payload?: unknown })
 
 function getClient(): DynamoDBClient | null {
   const region = process.env.REGION ?? process.env.AWS_REGION ?? "ap-south-1";
-  
+
   try {
     // Log configuration for debugging (region only, not credentials)
     if (process.env.NODE_ENV === "development") {
       console.log("[DynamoDB] Initializing client with region:", region);
     }
-    // Use defaultProvider to automatically load credentials from:
-    // - Lambda execution role (Amplify)
-    // - Environment variables (local development)
-    // - AWS CLI credentials
-    // - etc.
-    return new DynamoDBClient({ 
+    // Automatically loads credentials from the environment (Amplify IAM roles, ENV vars, etc)
+    // using the built-in AWS SDK fallback provider chain.
+    return new DynamoDBClient({
       region,
-      credentials: defaultProvider(),
     });
   } catch (error) {
     console.error("[DynamoDB] Failed to initialize client:", error);
@@ -79,16 +74,16 @@ function enrichItem(rawItem: Record<string, unknown> | EnergyItem): EnergyItem {
     PK: String(rawItem.PK ?? PK),
     SK: String(
       (rawItem as Record<string, unknown>).timestamp ??
-        (rawItem as Record<string, unknown>).SK ??
-        ""
+      (rawItem as Record<string, unknown>).SK ??
+      ""
     ),
     payload,
     timestamp:
       (rawItem as Record<string, unknown>).timestamp !== undefined
         ? parseInt(String((rawItem as Record<string, unknown>).timestamp), 10)
         : (rawItem as Record<string, unknown>).SK
-        ? parseInt(String((rawItem as Record<string, unknown>).SK), 10)
-        : undefined,
+          ? parseInt(String((rawItem as Record<string, unknown>).SK), 10)
+          : undefined,
   };
 
   // if the raw payload didn't include a time field, use the item's
@@ -115,9 +110,9 @@ export async function queryLastNPoints(
   const doc = getDocClient();
   const table = getTable();
   const region = process.env.REGION ?? process.env.AWS_REGION ?? "ap-south-1";
-  
+
   console.log("[queryLastNPoints] Starting query:", { table, region, pk: PK, n, limit: Math.min(n, 500) });
-  
+
   if (!doc) {
     console.error("[DynamoDB] DDB client not available - credentials may not be loaded");
     return { items: [] };
@@ -132,12 +127,12 @@ export async function queryLastNPoints(
       Limit: Math.min(n, 500),
     };
     console.log("[queryLastNPoints] Query input:", JSON.stringify(input));
-    
+
     const res = await doc.send(new QueryCommand(input));
-    
+
     console.log("[queryLastNPoints] DynamoDB response Count:", res.Count, "ScannedCount:", res.ScannedCount);
     console.log("[queryLastNPoints] Raw response.Items length:", res.Items?.length ?? 0);
-    
+
     const rawItems = (res.Items ?? []) as Record<string, unknown>[];
     const items = rawItems.map(enrichItem);
     const sorted = items.sort(
@@ -149,7 +144,7 @@ export async function queryLastNPoints(
     // also log first/last timestamps for quick sanity check
     if (items.length > 0) {
       console.log(
-        `[DynamoDB] first ts=${items[0].timestamp}, last ts=${items[items.length-1].timestamp}`
+        `[DynamoDB] first ts=${items[0].timestamp}, last ts=${items[items.length - 1].timestamp}`
       );
     }
     return { items: sorted };
@@ -166,9 +161,9 @@ export async function queryLatest(): Promise<EnergyItem | null> {
   const doc = getDocClient();
   const table = getTable();
   const region = process.env.REGION ?? process.env.AWS_REGION ?? "ap-south-1";
-  
+
   console.log("[queryLatest] Starting query:", { table, region, pk: PK });
-  
+
   if (!doc) {
     console.error("[DynamoDB] DDB client not available - credentials may not be loaded");
     return null;
@@ -183,12 +178,12 @@ export async function queryLatest(): Promise<EnergyItem | null> {
       Limit: 1,
     };
     console.log("[queryLatest] Query input:", JSON.stringify(input));
-    
+
     const res = await doc.send(new QueryCommand(input));
-    
+
     console.log("[queryLatest] DynamoDB response Count:", res.Count, "ScannedCount:", res.ScannedCount);
     console.log("[queryLatest] Raw response.Items length:", res.Items?.length ?? 0);
-    
+
     const raw = res.Items?.[0] as Record<string, unknown> | undefined;
     const item = raw ? enrichItem(raw) : null;
     console.log("[DynamoDB] queryLatest returned", item ? 1 : 0, "item(s)");

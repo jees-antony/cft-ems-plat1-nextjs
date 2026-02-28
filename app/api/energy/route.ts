@@ -6,6 +6,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { queryLastNPoints } from "@/lib/dynamodb";
 
+console.log("ENV:", {
+  REGION: process.env.REGION,
+  AWS_REGION: process.env.AWS_REGION,
+  TABLE: process.env.DDB_TABLE,
+});
+
 export async function GET(request: NextRequest) {
   try {
     const points = Math.min(
