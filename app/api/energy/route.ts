@@ -6,6 +6,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { queryLastNPoints } from "@/lib/dynamodb";
 
+console.log("ENV:", {
+  REGION: process.env.REGION,
+  // AWS_REGION: process.env.AWS_REGION,
+  TABLE: process.env.DDB_TABLE,
+});
+
 export async function GET(request: NextRequest) {
   try {
     const points = Math.min(
@@ -13,6 +19,7 @@ export async function GET(request: NextRequest) {
       500
     );
     const { items } = await queryLastNPoints(points);
+    console.log("[api/energy] returning", items.length, "points");
     return NextResponse.json({ items });
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : String(err);

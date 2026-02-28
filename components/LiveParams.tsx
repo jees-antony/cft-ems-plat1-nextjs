@@ -9,6 +9,9 @@ interface LiveParamsProps {
 
 export function LiveParams({ latest, loading }: LiveParamsProps) {
   const p = latest?.payload;
+  // if the server didn't provide a time field, look at the item's SK/timestamp
+  const rawTs = p?.time ?? latest?.timestamp;
+
   if (!p || loading) {
     return (
       <div className="live-params">
@@ -43,9 +46,19 @@ export function LiveParams({ latest, loading }: LiveParamsProps) {
           </div>
         ))}
       </div>
-      {p.time && (
+      {rawTs && (
         <p className="last-updated">
-          Last update: {new Date(p.time).toLocaleString()}
+          Last update: {
+            new Date(rawTs).toLocaleString(undefined, {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              hour12: false,
+            })
+          }
         </p>
       )}
     </div>

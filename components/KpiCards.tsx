@@ -35,6 +35,8 @@ const cards: {
 ];
 
 export function KpiCards({ kpis, loading }: KpiCardsProps) {
+  console.log("[KpiCards] Rendered with KPIs:", kpis, "loading:", loading);
+
   return (
     <div className="kpi-cards">
       {cards.map(({ key, label, unit, color, format }) => {

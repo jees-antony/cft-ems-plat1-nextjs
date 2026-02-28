@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { FooterTimestamp } from "@/components/FooterTimestamp";
+import { BottomNav } from "@/components/BottomNav";
 
 export const metadata: Metadata = {
   title: "CFT Energy Dash",
@@ -13,7 +15,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className="layout-wrapper" style={{ paddingBottom: "80px" }}>
+          {children}
+        </div>
+        <BottomNav />
+        <FooterTimestamp />
+      </body>
     </html>
   );
 }
