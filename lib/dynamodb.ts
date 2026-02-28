@@ -8,6 +8,7 @@ import {
   QueryCommand,
   type QueryCommandInput,
 } from "@aws-sdk/lib-dynamodb";
+import { defaultProvider } from "@aws-sdk/credential-provider-node";
 import type { EnergyItem, EnergyPayload } from "./energy/types";
 
 const PK = "cft/ems/site1";
@@ -47,7 +48,15 @@ function getClient(): DynamoDBClient | null {
     if (process.env.NODE_ENV === "development") {
       console.log("[DynamoDB] Initializing client with region:", region);
     }
-    return new DynamoDBClient({ region });
+    // Use defaultProvider to automatically load credentials from:
+    // - Lambda execution role (Amplify)
+    // - Environment variables (local development)
+    // - AWS CLI credentials
+    // - etc.
+    return new DynamoDBClient({ 
+      region,
+      credentials: defaultProvider(),
+    });
   } catch (error) {
     console.error("[DynamoDB] Failed to initialize client:", error);
     return null;
