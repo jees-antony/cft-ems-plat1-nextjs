@@ -8,7 +8,7 @@ import { queryLastNPoints } from "@/lib/dynamodb";
 
 console.log("ENV:", {
   REGION: process.env.REGION,
-  AWS_REGION: process.env.AWS_REGION,
+  // AWS_REGION: process.env.AWS_REGION,
   TABLE: process.env.DDB_TABLE,
 });
 
