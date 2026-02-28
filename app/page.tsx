@@ -11,27 +11,22 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 const POLL_INTERVAL_MS = 30_000;
 
 export default function DashboardPage() {
-  const { data: trendData, isLoading: trendLoading } = useSWR<{
+  // Fetch only the trend data (last N points); extract latest from that
+  const { data: trendData, isLoading: loading } = useSWR<{
     items: EnergyItem[];
-  }>("/api/energy?points=6", fetcher, {
-    refreshInterval: POLL_INTERVAL_MS,
-  });
-
-  const { data: latestData, isLoading: latestLoading } = useSWR<{
-    item: EnergyItem | null;
-  }>("/api/energy/latest", fetcher, {
+  }>("/api/energy?points=60", fetcher, {
     refreshInterval: POLL_INTERVAL_MS,
   });
 
   const items = trendData?.items ?? [];
-  const latest = latestData?.item ?? null;
+  // Latest is the last item in the sorted array (oldest → newest)
+  const latest = items.length > 0 ? items[items.length - 1] : null;
   const energyData: EnergyDataPoint[] = mapItemsToDataPoints(items);
   const topKpis = mapLatestToKpis(latest);
-  const loading = trendLoading || latestLoading;
 
   // Log API responses and data mapping
-  console.log("[Dashboard] API trend response:", trendData);
-  console.log("[Dashboard] API latest response:", latestData);
+  console.log("[Dashboard] API trend response items count:", items.length);
+  console.log("[Dashboard] Extracted latest from items:", latest);
   console.log("[Dashboard] Mapped energy data:", energyData);
   console.log("[Dashboard] Top KPIs:", topKpis);
   console.log("[Dashboard] Loading:", loading);

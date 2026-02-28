@@ -6,20 +6,24 @@ import type { EnergyItem } from "@/lib/energy/types";
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
 export function FooterTimestamp() {
-  const { data, isLoading } = useSWR<{ item: EnergyItem | null }>(
-    "/api/energy/latest",
+  // Use the same trend endpoint as the main dashboard for consistency
+  // SWR will deduplicate and share the cache with the page's request
+  const { data } = useSWR<{ items: EnergyItem[] }>(
+    "/api/energy?points=60",
     fetcher,
     { refreshInterval: 30_000 }
   );
 
-  const item = data?.item ?? null;
+  // Extract the latest (last) item from the trend
+  const items = data?.items ?? [];
+  const item = items.length > 0 ? items[items.length - 1] : null;
   const ts =
     item?.payload?.time ??
-    item?.timestamp; // fallback if payload didn't carry time
+    item?.timestamp;
 
-  console.log("[FooterTimestamp] API response:", data, "Timestamp value:", ts);
+  console.log("[FooterTimestamp] Using trend data - Latest item:", item, "Timestamp:", ts);
 
-  if (!ts || isLoading) return null;
+  if (!ts) return null;
 
   return (
     <footer className="footer-ts">
