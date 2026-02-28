@@ -104,6 +104,11 @@ export async function queryLastNPoints(
   n: number
 ): Promise<{ items: EnergyItem[] }> {
   const doc = getDocClient();
+  const table = getTable();
+  const region = process.env.REGION ?? process.env.AWS_REGION ?? "ap-south-1";
+  
+  console.log("[queryLastNPoints] Starting query:", { table, region, pk: PK, n, limit: Math.min(n, 500) });
+  
   if (!doc) {
     console.error("[DynamoDB] DDB client not available - credentials may not be loaded");
     return { items: [] };
@@ -111,13 +116,19 @@ export async function queryLastNPoints(
 
   try {
     const input: QueryCommandInput = {
-      TableName: getTable(),
+      TableName: table,
       KeyConditionExpression: "PK = :pk",
       ExpressionAttributeValues: { ":pk": PK },
       ScanIndexForward: false,
       Limit: Math.min(n, 500),
     };
+    console.log("[queryLastNPoints] Query input:", JSON.stringify(input));
+    
     const res = await doc.send(new QueryCommand(input));
+    
+    console.log("[queryLastNPoints] DynamoDB response Count:", res.Count, "ScannedCount:", res.ScannedCount);
+    console.log("[queryLastNPoints] Raw response.Items length:", res.Items?.length ?? 0);
+    
     const rawItems = (res.Items ?? []) as Record<string, unknown>[];
     const items = rawItems.map(enrichItem);
     const sorted = items.sort(
@@ -135,13 +146,20 @@ export async function queryLastNPoints(
     return { items: sorted };
   } catch (error: any) {
     console.error("[DynamoDB Query] Error:", error?.message || String(error));
+    console.error("[DynamoDB Query] Full error:", error);
     return { items: [] };
   }
 }
 
+
 /** Query latest single record */
 export async function queryLatest(): Promise<EnergyItem | null> {
   const doc = getDocClient();
+  const table = getTable();
+  const region = process.env.REGION ?? process.env.AWS_REGION ?? "ap-south-1";
+  
+  console.log("[queryLatest] Starting query:", { table, region, pk: PK });
+  
   if (!doc) {
     console.error("[DynamoDB] DDB client not available - credentials may not be loaded");
     return null;
@@ -149,19 +167,26 @@ export async function queryLatest(): Promise<EnergyItem | null> {
 
   try {
     const input: QueryCommandInput = {
-      TableName: getTable(),
+      TableName: table,
       KeyConditionExpression: "PK = :pk",
       ExpressionAttributeValues: { ":pk": PK },
       ScanIndexForward: false,
       Limit: 1,
     };
+    console.log("[queryLatest] Query input:", JSON.stringify(input));
+    
     const res = await doc.send(new QueryCommand(input));
+    
+    console.log("[queryLatest] DynamoDB response Count:", res.Count, "ScannedCount:", res.ScannedCount);
+    console.log("[queryLatest] Raw response.Items length:", res.Items?.length ?? 0);
+    
     const raw = res.Items?.[0] as Record<string, unknown> | undefined;
     const item = raw ? enrichItem(raw) : null;
     console.log("[DynamoDB] queryLatest returned", item ? 1 : 0, "item(s)");
     return item;
   } catch (error: any) {
     console.error("[DynamoDB Query Latest] Error:", error?.message || String(error));
+    console.error("[DynamoDB Query Latest] Full error:", error);
     return null;
   }
 }
