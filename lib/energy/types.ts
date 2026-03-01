@@ -44,6 +44,10 @@ export interface EnergyPayload {
   co2_energy_meter?: number;
   frascold_energy_meter?: number;
   new_IQF_energy_meter?: number;
+  NH3Unit1?: number;
+  NH3unit2?: number;
+  NewIQFRunning?: number | string;
+  OldIQFRunning?: number | string;
 
   // additional live data used by UI components
   load?: LoadData;
@@ -84,12 +88,20 @@ export interface EnergyDataPoint {
   co2Energy?: number;
   frascoldEnergy?: number;
   newIqfEnergy?: number;
+  nh3Unit1?: number;
+  nh3Unit2?: number;
+  newIqfRunning?: string; // "Running" | "Stopped"
+  oldIqfRunning?: string;
 }
 
 export interface TopKpis {
   co2Energy: number;
   frascoldEnergy: number;
   newIqfEnergy: number;
+  nh3Unit1: number;
+  nh3Unit2: number;
+  newIqfRunning: string;
+  oldIqfRunning: string;
 
   // additional KPIs for power flow component
   solarKw: number;

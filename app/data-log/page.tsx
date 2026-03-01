@@ -30,7 +30,11 @@ export default function DataLogPage() {
             Timestamp: new Date(d.time).toLocaleString(),
             "CO2 Energy (kWh)": d.co2Energy,
             "Frascold Energy (kWh)": d.frascoldEnergy,
-            "New IQF Energy (kWh)": d.newIqfEnergy,
+          "New IQF Energy (kWh)": d.newIqfEnergy,
+          "NH3 Unit 1": d.nh3Unit1,
+          "NH3 Unit 2": d.nh3Unit2,
+          "New IQF Status": d.newIqfRunning,
+          "Old IQF Status": d.oldIqfRunning,
         }));
 
         const worksheet = xlsx.utils.json_to_sheet(exportData);

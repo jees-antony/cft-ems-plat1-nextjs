@@ -20,6 +20,18 @@ export function mapItemsToDataPoints(items: EnergyItem[]): EnergyDataPoint[] {
       co2Energy: p.co2_energy_meter,
       frascoldEnergy: p.frascold_energy_meter,
       newIqfEnergy: p.new_IQF_energy_meter,
+      // NH3 sensors (some payloads use different casing)
+      nh3Unit1: (p.NH3Unit1 ?? p.NH3unit1) as number | undefined,
+      nh3Unit2: (p.NH3unit2 ?? p.NH3Unit2) as number | undefined,
+      // Running flags: normalize 1/0 or "1"/"0" to human-readable
+      newIqfRunning:
+        String(p.NewIQFRunning ?? p.NewIqfRunning ?? p.newIQFRunning ?? "0") === "1"
+          ? "Running"
+          : "Stopped",
+      oldIqfRunning:
+        String(p.OldIQFRunning ?? p.OldIqfRunning ?? p.oldIQFRunning ?? "0") === "1"
+          ? "Running"
+          : "Stopped",
     };
   });
 }
@@ -32,6 +44,10 @@ export function mapLatestToKpis(item: EnergyItem | null): TopKpis {
       co2Energy: 0,
       frascoldEnergy: 0,
       newIqfEnergy: 0,
+      nh3Unit1: 0,
+      nh3Unit2: 0,
+      newIqfRunning: "Stopped",
+      oldIqfRunning: "Stopped",
       solarKw: 0,
       gridKw: 0,
       loadKw: 0,
@@ -43,6 +59,16 @@ export function mapLatestToKpis(item: EnergyItem | null): TopKpis {
     co2Energy: p.co2_energy_meter ?? 0,
     frascoldEnergy: p.frascold_energy_meter ?? 0,
     newIqfEnergy: p.new_IQF_energy_meter ?? 0,
+    nh3Unit1: (p.NH3Unit1 ?? p.NH3unit1) ?? 0,
+    nh3Unit2: (p.NH3unit2 ?? p.NH3Unit2) ?? 0,
+    newIqfRunning:
+      String(p.NewIQFRunning ?? p.NewIqfRunning ?? p.newIQFRunning ?? "0") === "1"
+        ? "Running"
+        : "Stopped",
+    oldIqfRunning:
+      String(p.OldIQFRunning ?? p.OldIqfRunning ?? p.oldIQFRunning ?? "0") === "1"
+        ? "Running"
+        : "Stopped",
 
     solarKw: computeSolarKw(p),
     gridKw: p.in?.Kw ?? 0,
