@@ -46,6 +46,16 @@ export function LiveParams({ latest, loading }: LiveParamsProps) {
           </div>
         ))}
       </div>
+      <div className="status-grid">
+        <div className="status-item">
+          <span className="param-label">New IQF</span>
+          <span className="param-value">{p.NewIQFRunning === undefined ? "—" : (String(p.NewIQFRunning) === "1" ? "Running" : "Stopped")}</span>
+        </div>
+        <div className="status-item">
+          <span className="param-label">Old IQF</span>
+          <span className="param-value">{p.OldIQFRunning === undefined ? "—" : (String(p.OldIQFRunning) === "1" ? "Running" : "Stopped")}</span>
+        </div>
+      </div>
       {rawTs && (
         <p className="last-updated">
           Last update: {

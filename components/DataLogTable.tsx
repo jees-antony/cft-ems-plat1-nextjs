@@ -48,6 +48,10 @@ export function DataLogTable({ data, loading }: DataLogTableProps) {
                         <th>CO₂ Energy (kWh)</th>
                         <th>Frascold Energy (kWh)</th>
                         <th>New IQF Energy (kWh)</th>
+                        <th>NH3 Unit 1</th>
+                        <th>NH3 Unit 2</th>
+                        <th>New IQF Status</th>
+                        <th>Old IQF Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,6 +61,10 @@ export function DataLogTable({ data, loading }: DataLogTableProps) {
                             <td>{row.co2Energy?.toFixed(2) ?? "0.00"}</td>
                             <td>{row.frascoldEnergy?.toFixed(2) ?? "0.00"}</td>
                             <td>{row.newIqfEnergy?.toFixed(2) ?? "0.00"}</td>
+                            <td>{typeof row.nh3Unit1 === "number" ? row.nh3Unit1.toFixed(4) : "—"}</td>
+                            <td>{typeof row.nh3Unit2 === "number" ? row.nh3Unit2.toFixed(4) : "—"}</td>
+                            <td>{row.newIqfRunning ?? "Stopped"}</td>
+                            <td>{row.oldIqfRunning ?? "Stopped"}</td>
                         </tr>
                     ))}
                 </tbody>

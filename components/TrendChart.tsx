@@ -43,6 +43,8 @@ export function TrendChart({ data, loading }: TrendChartProps) {
     co2: d.co2Energy ?? 0,
     frascold: d.frascoldEnergy ?? 0,
     newIqf: d.newIqfEnergy ?? 0,
+    nh3_1: d.nh3Unit1 ?? 0,
+    nh3_2: d.nh3Unit2 ?? 0,
   }));
 
   console.log("[TrendChart] Transformed chart data:", chartData);
@@ -85,6 +87,22 @@ export function TrendChart({ data, loading }: TrendChartProps) {
             dataKey="newIqf"
             name="New IQF Energy (kWh)"
             stroke="var(--accent-grid)"
+            dot={false}
+            strokeWidth={2}
+          />
+          <Line
+            type="monotone"
+            dataKey="nh3_1"
+            name="NH3 Unit 1"
+            stroke="#ffa500"
+            dot={false}
+            strokeWidth={2}
+          />
+          <Line
+            type="monotone"
+            dataKey="nh3_2"
+            name="NH3 Unit 2"
+            stroke="#00bcd4"
             dot={false}
             strokeWidth={2}
           />
