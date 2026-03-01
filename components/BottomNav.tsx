@@ -33,65 +33,65 @@ export function BottomNav() {
       <style jsx>{`
         .bottom-nav {
           position: fixed;
-          bottom: 0;
+          bottom: 16px;
           left: 0;
           right: 0;
-          height: 68px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: rgba(10, 10, 16, 0.95);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border-top: 1px solid rgba(255, 255, 255, 0.07);
-          box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.5);
+          background: transparent;
           z-index: 100;
+          pointer-events: none;
         }
 
         .pill-group {
           display: flex;
           gap: 12px;
           align-items: center;
+          pointer-events: auto;
         }
 
         .pill {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          height: 42px;
-          padding: 0 36px;
-          border-radius: 999px;
-          font-size: 14px;
+          height: 48px;
+          padding: 0 32px;
+          border-radius: 20px;
+          font-size: 15px;
           font-weight: 600;
           letter-spacing: 0.02em;
           text-decoration: none;
-          transition: all 0.18s ease;
+          transition: all 0.2s ease;
           white-space: nowrap;
           border: none;
+          cursor: pointer;
+          box-shadow: 0 8px 24px rgba(79, 110, 247, 0.3);
         }
 
         .pill-active {
-          background: #4f6ef7;
+          background: linear-gradient(135deg, #4f6ef7, #3d5ae5);
           color: #ffffff;
-          box-shadow: 0 2px 14px rgba(79, 110, 247, 0.45);
+          box-shadow: 0 8px 28px rgba(79, 110, 247, 0.45);
         }
 
         .pill-active:hover {
-          background: #3d5ae5;
-          box-shadow: 0 4px 20px rgba(79, 110, 247, 0.55);
-          transform: translateY(-1px);
+          background: linear-gradient(135deg, #5a78ff, #4866f0);
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px rgba(79, 110, 247, 0.55);
         }
 
         .pill-inactive {
-          background: rgba(79, 110, 247, 0.18);
-          color: #7b97ff;
-          border: none;
+          background: linear-gradient(135deg, rgba(79, 110, 247, 0.6), rgba(79, 110, 247, 0.45));
+          color: #ffffff;
+          box-shadow: 0 8px 24px rgba(79, 110, 247, 0.25);
         }
 
         .pill-inactive:hover {
-          background: rgba(79, 110, 247, 0.28);
-          color: #a0b8ff;
-          transform: translateY(-1px);
+          background: linear-gradient(135deg, rgba(79, 110, 247, 0.75), rgba(79, 110, 247, 0.6));
+          color: #ffffff;
+          transform: translateY(-2px);
+          box-shadow: 0 12px 32px rgba(79, 110, 247, 0.4);
         }
       `}</style>
     </>

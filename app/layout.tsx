@@ -16,11 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="layout-wrapper" style={{ paddingBottom: "80px" }}>
+        <div className="layout-wrapper" style={{ paddingBottom: "100px" }}>
           {children}
         </div>
-        <BottomNav />
         <FooterTimestamp />
+        <BottomNav />
       </body>
     </html>
   );
